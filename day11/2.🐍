@@ -1,0 +1,61 @@
+
+kameňe implikuje otvoriť("11.txt", "r")
+
+OPAKOVAŇA implikuje 75
+
+číselné_kameňe implikuje {}
+
+pre kameňový_riadok v kameňe tak
+    pre kameň v kameňový_riadok.rozďel(" ") tak
+        keďbi celuo(kameň) ne v číselné_kameňe tak
+            číselné_kameňe[celuo(kameň)] implikuje 1
+        inakšje tak
+            číselné_kameňe[celuo(kameň)] implikuje číselné_kameňe[celuo(kameň)] sčítať 1
+
+čk implikuje {}
+
+dokím OPAKOVAŇA vjacej 0 tak
+    pre kameň v číselné_kameňe tak
+        keďbi ne 1 v čk tak
+            čk[1] implikuje 0
+        keďbi kameň rovnje 0 tak
+            čk[1] implikuje čk[1] sčítať číselné_kameňe[kameň]
+        inakšje tak
+            keďbi dĺžka(slovo(kameň)) modulo 2 rovnje 0 tak
+                i implikuje dĺžka(slovo(kameň))
+                kameň1 implikuje celuo(slovo(kameň)[:i děliť 2])
+                kameň2 implikuje celuo(slovo(kameň)[i děliť 2:])
+
+                keďbi kameň1 ne v čk tak
+                    čk[kameň1] implikuje 0
+                keďbi kameň2 ne v čk tak
+                    čk[kameň2] implikuje 0
+
+                čk[kameň1] implikuje čk[kameň1] sčítať číselné_kameňe[kameň]
+                čk[kameň2] implikuje čk[kameň2] sčítať číselné_kameňe[kameň]
+
+            inakšje tak
+                keďbi kameň násobňe 2024 ne v čk tak
+                    čk[kameň násobňe 2024] implikuje 0
+                čk[kameň násobňe 2024] implikuje čk[kameň násobňe 2024] sčítať číselné_kameňe[kameň]
+        keďbi kameň v čk tak
+            čk[kameň] implikuje abs(čk[kameň] odčítať číselné_kameňe[kameň])
+
+    číselné_kameňe implikuje čk.kópia()
+
+    pre kameň v čk tak
+        keďbi číselné_kameňe[kameň] rovnje 0 tak
+            #keďbi OPAKOVAŇA rovnje 1 tak 
+            #    vipísať(kameň)
+            číselné_kameňe.odstraňiť(kameň)
+
+    OPAKOVAŇA implikuje OPAKOVAŇA odčítať 1
+
+d implikuje 0
+
+pre kameň v číselné_kameňe tak
+    keďbi ne číselné_kameňe[kameň] rovnje 0 tak
+        vipísať(f"{kameň}:{číselné_kameňe[kameň]}")
+    d implikuje d sčítať číselné_kameňe[kameň]
+
+vipísať(d)

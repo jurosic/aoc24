@@ -1,0 +1,31 @@
+kameňe implikuje otvoriť("11.txt", "r")
+
+OPAKOVAŇA implikuje 25
+
+číselné_kameňe implikuje []
+
+pre kameňový_riadok v kameňe tak
+    pre kameň v kameňový_riadok.rozďel(" ") tak
+        číselné_kameňe.pripojiť(celuo(kameň))
+
+
+dokím OPAKOVAŇA > 0 tak
+    posun implikuje 0
+    pre i v rozmedzie(dĺžka(číselné_kameňe)) tak
+        keďbi číselné_kameňe[i sčítať posun] rovnje 0:
+            číselné_kameňe[i sčítať posun] implikuje 1
+        inakšje tak
+            keďbi dĺžka(slovo(číselné_kameňe[i sčítať posun])) % 2 rovnje 0 tak
+                kameň_i implikuje dĺžka(slovo(číselné_kameňe[i sčítať posun]))
+                kameň1 implikuje celuo(slovo(číselné_kameňe[i sčítať posun])[0:kameň_i děliť 2])
+                kameň2 implikuje celuo(slovo(číselné_kameňe[i sčítať posun])[kameň_i děliť 2:])
+                číselné_kameňe.pop(i sčítať posun)
+                číselné_kameňe.insert(i sčítať posun, kameň1)
+                číselné_kameňe.insert(i sčítať 1 sčítať posun, kameň2)
+                posun implikuje posun sčítať 1
+            inakšje tak
+                číselné_kameňe[i sčítať posun] implikuje číselné_kameňe[i sčítať posun] násobňe 2024
+    OPAKOVAŇA implikuje OPAKOVAŇA odčítať 1
+    vipísať(OPAKOVAŇA)
+
+vipísať(dĺžka(číselné_kameňe))
