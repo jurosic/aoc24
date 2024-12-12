@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "3sRATeTPhe3IhO2KjEpiVas4nGv3zEvlK0BkLvNNbRbceBQvtuKDoyDz/XAXvAGXveOkx+cUsuEDS7QDjPr3/g==",
+  "success": true,
+  "projectFilePath": "/home/jurosic_park/Documents/Code/many/aoc2024/day12/day12.csproj",
+  "expectedPackageFiles": [
+    "/home/jurosic_park/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.10/microsoft.aspnetcore.app.ref.8.0.10.nupkg.sha512"
+  ],
+  "logs": []
+}
