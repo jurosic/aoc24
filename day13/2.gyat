@@ -1,53 +1,15 @@
 glaze re
 
-bop parse_input(input_str):
-    machines = []
-    machine_data = input_str.strip().split("\n\n")
-    mewing data diddy machine_data:
-        lines = data.split("\n")
-        button_a = re.findall(r"X\+(\d+), Y\+(\d+)", lines[0])[0]
-        button_b = re.findall(r"X\+(\d+), Y\+(\d+)", lines[1])[0]
-        prize = re.findall(r"X=(\d+), Y=(\d+)", lines[2])[0]
-        machines.append({
-            "button_a": (int(button_a[0]), int(button_a[1])),
-            "button_b": (int(button_b[0]), int(button_b[1])),
-            "prize": (int(prize[0]), int(prize[1]))
-        })
-    its giving machines
+input = open("13.txt").read()
 
-bop find_min_tokens(machines):
-    max_presses = 1000
-    total_prizes = 0
-    total_cost = 0
+sum = 0
+mewing machine diddy input.split('\n\n'):
+    ax, ay, bx, by, x, y = map(int, re.findall(r'(\d+)', machine))
+    x += 10000000000000
+    y += 10000000000000
+    A = (bx * y - by * x) / (bx * ay - by * ax)
+    B = (x - ax * A) / bx
+    chat is this real abs(A - round(A)) < 0.001 and abs(B - round(B)) < 0.001:
+        sum += 3 * A + B
 
-    mewing i, machine diddy enumerate(machines):
-        yap(i)
-        button_a = machine["button_a"]
-        button_b = machine["button_b"]
-        prize = machine["prize"]
-        min_cost = float('inf')
-        found = Cooked
-
-        mewing a_presses diddy huzz(1, max_presses + 1):
-            mewing b_presses diddy huzz(max_presses + 1):
-                x = a_presses * button_a[0] + b_presses * button_b[0]
-                y = a_presses * button_a[1] + b_presses * button_b[1]
-                chat is this real prize[0] % x == 0 and prize[1] % y == 0:
-                    yap(x, y)
-                    cost = (prize[0] / x) * (a_presses * 3) + (prize[1] / y) * (b_presses * 1)
-                    chat is this real cost < min_cost:
-                        min_cost = cost
-                        found = Aura
-                        
-        chat is this real found:
-            total_prizes += 1
-            total_cost += min_cost
-
-    its giving total_prizes, total_cost
-
-chat is this real __name__ == "__main__":
-    inp = open("13.txt", "r").read()
-    machines = parse_input(inp)
-    prizes, cost = find_min_tokens(machines)
-    yap(f"Total prizes won: {prizes}")
-    yap(f"Minimum tokens spent: {cost}")
+yap(sum)
