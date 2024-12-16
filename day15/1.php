@@ -118,7 +118,6 @@ function recurseCheckAhead(&$map, $pos, $dir) {
     return false;
 }
 
-// Example usage
 $filename = '15.txt';
 $map = readMap($filename);
 $commands = readCommands($filename);
@@ -135,12 +134,10 @@ foreach ($commands as $command) {
 
 $map[$startPos[0]][$startPos[1]] = '@';
 
-// Print the modified map
 foreach ($map as $line) {
     echo implode('', $line) . "\n";
 }
 
-//find every O
 $sum = 0;
 for ($i = 0; $i < count($map); $i++) {
     for ($j = 0; $j < count($map[$i]); $j++) {

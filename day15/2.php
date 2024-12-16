@@ -1,162 +1,163 @@
 <?php
-function scaleWarehouse($originalMap) {
-    $scaledMap = [];
-    foreach ($originalMap as $line) {
-        $scaledLine = '';
-        for ($i = 0; $i < strlen($line); $i++) {
-            $tile = $line[$i];
-            switch ($tile) {
-                case '#':
-                    $scaledLine .= '##';
-                    break;
-                case 'O':
-                    $scaledLine .= '[]';
-                    break;
-                case '.':
-                    $scaledLine .= '..';
-                    break;
-                case '@':
-                    $scaledLine .= '@.';
-                    break;
+//never doing something willfully in php again
+
+function readMap($filename) {
+    $file = fopen($filename, 'r');
+    $map = [];
+    while ($line = fgets($file)) {
+        if ($line === "\n") {
+            break;
+        }
+        $row = [];
+        foreach (str_split(trim($line)) as $char) {
+            if ($char === "O") {
+                $row[] = "[";
+                $row[] = "]";
+            } elseif ($char === "@") {
+                $row[] = "@";
+                $row[] = ".";
+            } else {
+                $row[] = $char;
+                $row[] = $char;
             }
         }
-        // Repeat rows to match scaling vertically
-        $scaledMap[] = $scaledLine;
-        $scaledMap[] = $scaledLine;
+        $map[] = $row;
     }
-    return $scaledMap;
+    fclose($file);
+    return $map;
 }
 
-function moveRobot(&$map, $moves) {
-    $robotPos = findRobot($map);
-
-    foreach (str_split($moves) as $move) {
-        $newPos = $robotPos;
-        switch ($move) {
-            case '<':
-                $newPos = [$robotPos[0], $robotPos[1] - 2];
-                break;
-            case '>':
-                $newPos = [$robotPos[0], $robotPos[1] + 2];
-                break;
-            case '^':
-                $newPos = [$robotPos[0] - 2, $robotPos[1]];
-                break;
-            case 'v':
-                $newPos = [$robotPos[0] + 2, $robotPos[1]];
-                break;
+function readCommands($filename) {
+    $file = fopen($filename, 'r');
+    $commands = "";
+    $rc = false;
+    while ($line = fgets($file)) {
+        if ($line === "\n") {
+            $rc = true;
+            continue;
         }
-
-        if (isValidMove($map, $robotPos, $newPos)) {
-            performMove($map, $robotPos, $newPos);
-            $robotPos = $newPos;
-        }
-        // Log map state after each move
-        echo "After move '$move':\n";
-        foreach ($map as $line) {
-            echo $line . "\n";
-        }
-    }
-}
-
-function findRobot($map) {
-    foreach ($map as $row => $line) {
-        $col = strpos($line, '@');
-        if ($col !== false) {
-            return [$row, $col];
-        }
-    }
-    return null;
-}
-
-function isValidMove($map, $currentPos, $newPos) {
-    $rows = count($map);
-    $cols = strlen($map[0]);
-    list($newRow, $newCol) = $newPos;
-
-    if ($newRow < 0 || $newRow >= $rows || $newCol < 0 || $newCol >= $cols) {
-        return false; // Out of bounds
-    }
-
-    $targetTile = substr($map[$newRow], $newCol, 2);
-
-    if ($targetTile === '..') {
-        return true; // Open space
-    } elseif ($targetTile === '[]') {
-        // Check if the box can be pushed
-        $pushRow = $newRow + ($newRow - $currentPos[0]);
-        $pushCol = $newCol + ($newCol - $currentPos[1]);
-
-        if ($pushRow >= 0 && $pushRow < $rows && $pushCol >= 0 && $pushCol < $cols) {
-            $pushTile = substr($map[$pushRow], $pushCol, 2);
-            return $pushTile === '..'; // Box can be pushed to an open space
+        if ($rc) {
+            $commands .= trim($line);
         }
     }
 
-    return false;
+    fclose($file);
+    return $commands;
 }
 
-function performMove(&$map, $currentPos, $newPos) {
-    list($curRow, $curCol) = $currentPos;
-    list($newRow, $newCol) = $newPos;
-
-    $targetTile = substr($map[$newRow], $newCol, 2);
-
-    if ($targetTile === '[]') {
-        // Push the box
-        $pushRow = $newRow + ($newRow - $curRow);
-        $pushCol = $newCol + ($newCol - $curCol);
-        $map[$pushRow] = substr_replace($map[$pushRow], '[]', $pushCol, 2);
-    }
-
-    // Move the robot
-    $map[$curRow] = substr_replace($map[$curRow], '..', $curCol, 2);
-    $map[$newRow] = substr_replace($map[$newRow], '@.', $newCol, 2);
-}
-
-function calculateGPS($map) {
-    $gpsSum = 0;
-    foreach ($map as $row => $line) {
-        for ($col = 0; $col < strlen($line); $col += 2) {
-            if (substr($line, $col, 2) === '[]') {
-                $distanceFromTop = ($row / 2) + 1; // Account for scaling
-                $distanceFromLeft = ($col / 2) + 1;
-                $gpsSum += 100 * $distanceFromTop + $distanceFromLeft;
+function findStartingPos($map) {
+    for ($i = 0; $i < count($map); $i++) {
+        for ($j = 0; $j < count($map[0]); $j++) {
+            if ($map[$i][$j] == "@") {
+                return [$i, $j];
             }
         }
     }
-    return $gpsSum;
 }
 
-// Read input from file
-$input = file("15.txt", FILE_IGNORE_NEW_LINES);
-
-// Separate map and moves
-$originalMap = [];
-$moves = "";
-$readingMap = true;
-
-foreach ($input as $line) {
-    if (trim($line) === "") {
-        $readingMap = false;
-        continue;
+function findBoxes($map) {
+    $boxLocations = [];
+    for ($i = 0; $i < count($map); $i++) {
+        for ($j = 0; $j < count($map[0]); $j++) {
+            if ($map[$i][$j] == "[") {
+                $boxLocations[] = [$i, $j];
+            }
+        }
     }
-
-    if ($readingMap) {
-        $originalMap[] = $line;
-    } else {
-        $moves .= $line; // Append moves if multiple lines
-    }
+    return $boxLocations;
 }
 
-// Scale the map
-$scaledMap = scaleWarehouse($originalMap);
+function canShiftBox($map, $i, $j, $di, $dj, &$checked) {
+    if (in_array([$i, $j], $checked)) {
+        return true;
+    }
+    $checked[] = [$i, $j];
 
-// Move the robot
-moveRobot($scaledMap, $moves);
+    $new_i = $i + $di;
+    $new_j = $j + $dj;
 
-// Calculate GPS sum
-$gpsSum = calculateGPS($scaledMap);
+    if ($map[$new_i][$new_j] == "#") {
+        return false;
+    } elseif ($map[$new_i][$new_j] == "[") {
+        return canShiftBox($map, $new_i, $new_j, $di, $dj, $checked) && canShiftBox($map, $new_i, $new_j + 1, $di, $dj, $checked);
+    } elseif ($map[$new_i][$new_j] == "]") {
+        return canShiftBox($map, $new_i, $new_j, $di, $dj, $checked) && canShiftBox($map, $new_i, $new_j - 1, $di, $dj, $checked);
+    }
+    return true;
+}
 
-// Output result
-echo "Sum of GPS coordinates: $gpsSum\n";
+function isPositionValid($map, $i, $j) {
+    return 0 <= $i && $i < count($map) && 0 <= $j && $j < count($map[0]) && $map[$i][$j] != "#";
+}
+
+function run(&$map, $i, $j, $command) {
+    if ($command == "^"){
+        $di = -1;
+        $dj = 0;
+    } elseif ($command == "v") {
+        $di = 1;
+        $dj = 0;
+    } elseif ($command == "<") {
+        $di = 0;
+        $dj = -1;
+    } elseif ($command == ">") {
+        $di = 0;
+        $dj = 1;
+    }
+
+    $new_i = $i + $di;
+    $new_j = $j + $dj;
+
+    if (!isPositionValid($map, $new_i, $new_j)) {
+        return [$i, $j];
+    }
+
+    if ($map[$new_i][$new_j] == "[" or $map[$new_i][$new_j] == "]") {
+        $checked = [];
+
+        if (!canShiftBox($map, $i, $j, $di, $dj, $checked)) {
+            return [$i, $j];
+        }
+
+        while (count($checked) > 0) {
+            foreach ($checked as $key => $pos) {
+                list($box_i, $box_j) = $pos;
+                $new_box_i = $box_i + $di;
+                $new_box_j = $box_j + $dj;
+                if (!in_array([$new_box_i, $new_box_j], $checked)) {
+                    if ($map[$new_box_i][$new_box_j] != "@" && $map[$box_i][$box_j] != "@") {
+                        $map[$new_box_i][$new_box_j] = $map[$box_i][$box_j];
+                        $map[$box_i][$box_j] = ".";
+                    }
+                    unset($checked[$key]);
+                }
+            }
+        }
+
+        $map[$i][$j] = $map[$new_i][$new_j];
+        $map[$new_i][$new_j] = "@";
+        return [$new_i, $new_j];
+    }
+
+    $map[$i][$j] = ".";
+    $map[$new_i][$new_j] = "@";
+    return [$new_i, $new_j];
+}
+
+$expanded_map = readMap("15.txt");
+$commands = readCommands("15.txt");
+
+list($robot_i, $robot_j) = findStartingPos($expanded_map);
+foreach (str_split($commands) as $command) {
+    list($robot_i, $robot_j) = run($expanded_map, $robot_i, $robot_j, $command);
+}
+
+$total_score = 0;
+foreach (findBoxes($expanded_map) as $box) {
+    list($box_i, $box_j) = $box;
+    $total_score += 100 * $box_i + $box_j;
+}
+
+echo $total_score . "\n";
+
+?>
